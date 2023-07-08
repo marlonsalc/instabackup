@@ -118,22 +118,6 @@ class InstaBackup(object):
         with open(CACHE_FILE, "wb") as f:
             pickle.dump(self.cache, f)
             
-            
-    # def load_session(self):
-    #     if os.path.exists("session.pkl"):
-    #         with open("session.pkl", "rb") as f:
-    #             print("Loading credentials from cache")
-    #             return pickle.load(f)
-    #     cl = Client()
-    #     cl.login(username=self.username, password=self.password)
-        
-    #     self.save_session(cl)
-    #     return cl
-    
-    # def save_session(self, cl):
-    #     with open("session.pkl", "wb") as f:
-    #         pickle.dump(cl, f)
-    
     def get_stories(self, usuarios_backup) -> dict:
         stories = {}
         """
@@ -156,18 +140,6 @@ class InstaBackup(object):
             stories[user] = get_pk(user)
         
         return stories
-        
-    
-    # def get_stories_cache(self):
-    #     if 'stories' not in self.cache:
-    #         self.cache['stories'] = self.get_stories()
-    #         print("Stories loaded")
-        
-    #     else: 
-    #         print("Stories loaded from cache")
-    #     return self.cache['stories']
-     
-    
     
     
     def download_stories(self, users):
@@ -206,40 +178,14 @@ class InstaBackup(object):
                         # try:
                         if os.path.exists("story_{}.jpg".format(story)):
                             self.send_stories(story, media_type, message="{} - Nueva historia de {} 🎉".format(convert_time(taken_at), usuario_backup))
+                            self.delete_stories(story, media_type)
                         
                         elif os.path.exists("story_{}.webp".format(story)):
                             ConvertWebp("story_{}.webp".format(story)).convert()
                             self.send_stories(story, media_type, message="{} - Nueva historia de {} 🎉".format(convert_time(taken_at), usuario_backup))
-                            # time.sleep(1)
-                            # self.delete_stories(story, media_type)
-                        # except FileNotFoundError as e:
-                        #     if e.filename == "story_{}.jpg".format(story):
-                        #         self.send_stories(story, media_type, message="Nueva historia de {} 📚🎉".format(usuario_backup))
-                        #         continue
-                                # time.sleep(1)
-                                # self.delete_stories(story, media_type)
-                            
-        # for story, media_type in stories.items():
-        #     if not existe(story):
-        #         print(f"Nueva historia de {usuario_backup} 📚🎉")
-        #         self.cl.story_download(story, filename="story_{}".format(story), folder=".")
-        #         print("Downloaded story_{}".format(story))
-        #         # self.downloaded.append("story_{}".format(story))
-        #         if media_type == 2:
-        #             self.send_stories(story, media_type, message="Nueva historia de {} 📚🎉".format(usuario_backup)})
-        #             self.delete_stories(story, media_type)
-        #             # self.send_message("Nueva historia de soesitxx")
-                    
-                    
-        #         elif media_type == 1:
-        #             ConvertWebp("story_{}.webp".format(story)).convert()
-        #             self.send_stories(story, media_type)
-        #             self.delete_stories(story, media_type)
-        #     else:
-        #         continue
+                            self.delete_stories(story, media_type)
         self.save_cache()
         
-        # return self.downloaded
     
     def get_media(self, file):
         media = os.path.join(os.getcwd(), file)
@@ -247,8 +193,6 @@ class InstaBackup(object):
 
 
     def send_stories(self, story, media_type, message):
-        # token = "6372904069:AAEwfyXb1kp6hA3o1rU-2Htzqnud9eYDvYs"
-        # client_id = "755575697"
         media_type_code = media_type
         if media_type_code == 2:
             parse_data = self.get_media("story_{}.mp4".format(story))
@@ -260,9 +204,6 @@ class InstaBackup(object):
         self.bot.send_media(parse_data, media_type=media_type_code, caption=message)
         
         
-    # def send_message(self, message):
-    #     self.bot.send_message(self.token, self.chat_id, message)
-        
     def delete_stories(self, story, media_type):
         if media_type == 2:
             os.remove("story_{}.mp4".format(story))
@@ -273,19 +214,7 @@ class InstaBackup(object):
     
             
     
-        
-        
-# def get_stories(cl, username):
-#     id_user = cl.user_id_from_username(username)
-#     stories = cl.user_stories(id_user)
     
-#     stories_dict = {}
-#     for story in stories:
-#         stories_dict[story.pk] = story.media_type
-#     return stories_dict
-
-
-
 
 def main():
     insta = InstaBackup("USER", "PASSWORD")
